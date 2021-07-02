@@ -158,6 +158,7 @@ def generate_tor_config(args, authorities, relays, host_torrc_defaults):
     __generate_torrc_client(abs_conf_path)
     __generate_torrc_client_markov(abs_conf_path)
     __generate_torrc_client_perf(abs_conf_path)
+    __generate_torrc_hiddenservice(abs_conf_path)
 
     for hostname in host_torrc_defaults:
         host_path = "{}/{}".format(hosts_prefix, hostname)
@@ -350,6 +351,18 @@ def __generate_host_torrc(host_path, include_conf_torrc_fnames):
         outf.write(f"%include {get_host_rel_conf_path(TORRC_COMMON_FILENAME)}\n")
         for fname in include_conf_torrc_fnames:
             outf.write(f"%include {get_host_rel_conf_path(fname)}\n")
+
+def __generate_torrc_hiddenservice(conf_path):
+    torrc_file = open("{}/{}".format(conf_path, TORRC_HIDDENSERVICE_FILENAME), 'w')
+
+    torrc_file.write('ORPort 0\n')
+    torrc_file.write('DirPort 0\n')
+    torrc_file.write('ClientOnly 1\n')
+    torrc_file.write(f'SocksPort {TOR_SOCKS_PORT}\n')
+    torrc_file.write('HiddenServiceDir hs\n')
+    torrc_file.write(f'HiddenServicePort {TGEN_HIDDENSERVICE_PORT} 127.0.0.1:{TGEN_SERVER_PORT}\n')
+
+    torrc_file.close()
 
 def get_relays(args):
     data = load_json_data(args.relay_info_path)
