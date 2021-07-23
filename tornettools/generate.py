@@ -109,6 +109,13 @@ def __generate_shadow_config(args, authorities, relays, tgen_servers, perf_clien
     for client in tgen_clients:
         config["hosts"].update(__markovclient(args, client))
 
+    # pcap
+    for host in config["hosts"]:
+        config["hosts"][host]["options"]["pcap_directory"] = "pcap"
+    pcap_prefix = "{}/pcap".format(args.prefix)
+    if not os.path.exists(pcap_prefix):
+        os.makedirs(pcap_prefix)
+
     with open("{}/{}".format(args.prefix, SHADOW_CONFIG_FILENAME), 'w') as configfile:
         yaml.dump(config, configfile, sort_keys=False)
 
