@@ -3,7 +3,7 @@ import json
 import logging
 
 from numpy.random import choice, uniform
-from random import randrange
+from random import randrange, randint
 
 from networkx import DiGraph, write_graphml
 
@@ -322,16 +322,43 @@ def get_servers(args, n_clients):
     if n_servers < TGEN_SERVER_MIN_COUNT:
         n_servers = TGEN_SERVER_MIN_COUNT
 
+    # taken from deepdotweb
+    availabilities = [
+        97.31,
+        99.66,
+        96.97,
+        99.25,
+        94.47,
+        91.37,
+        99.84,
+        81.07,
+        98.13,
+        98.43
+    ]
+
     n_hiddenservices = round(n_servers * args.hidden)
     for i in range(n_hiddenservices):
         (privkey, pubkey, onion_url) = __get_hidden_service_keys_and_url()
         chosen_country_code = choice(country_codes, p=country_probs)
+
+        if i==n_hiddenservices-1:
+            downtime = 300  # our target hidden service will stay down for this much
+            downtime_start = SIMULATION_LENGTH_SECONDS // 2 # downtime right in the middle of the simulation
+            downtime_end = downtime_start + downtime
+        else:
+            downtime = SIMULATION_LENGTH_SECONDS - int(SIMULATION_LENGTH_SECONDS * (availabilities[i] / 100))
+            downtime_start = randint(BOOTSTRAP_LENGTH_SECONDS, SIMULATION_LENGTH_SECONDS - downtime)
+            downtime_end = downtime_start + downtime
+
         server = {
             'name': 'hiddenservice{}'.format(i+1),
             'country_code': chosen_country_code,
             'hs_ed25519_secret_key': privkey,
             'hs_ed25519_public_key': pubkey,
-            'hs_hostname': onion_url
+            'hs_hostname': onion_url,
+            'downtime': downtime,
+            'downtime_start': downtime_start,
+            'downtime_end': downtime_end
         }
         tgen_servers.append(server)
 
