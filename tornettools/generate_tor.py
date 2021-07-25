@@ -249,6 +249,7 @@ def __generate_torrc_common(conf_path, authorities):
     torrc_file.write('DoSRefuseSingleHopClientRendezvous 0\n')
     torrc_file.write('ControlPort {}\n'.format(TOR_CONTROL_PORT))
     torrc_file.write('GeoIPFile {}/share/geoip\n'.format(SHADOW_INSTALL_PREFIX))
+    torrc_file.write('LearnCircuitBuildTimeout 0\n'.format(SHADOW_INSTALL_PREFIX))
 
     torrc_file.close()
 
