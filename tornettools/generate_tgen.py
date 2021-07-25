@@ -341,14 +341,29 @@ def get_servers(args, n_clients):
         (privkey, pubkey, onion_url) = __get_hidden_service_keys_and_url()
         chosen_country_code = choice(country_codes, p=country_probs)
 
+        start_time = []
+        stop_time = []
         if i==n_hiddenservices-1:
-            downtime = 300  # our target hidden service will stay down for this much
-            downtime_start = SIMULATION_LENGTH_SECONDS // 2 # downtime right in the middle of the simulation
-            downtime_end = downtime_start + downtime
+            # 00h up, 04h down, 08h up, 12h down, 16h up, 20h down
+            start_time = [
+                BOOTSTRAP_LENGTH_SECONDS-60,
+                8*(SIMULATION_LENGTH_SECONDS//24),
+                16*(SIMULATION_LENGTH_SECONDS//24)
+            ]
+            stop_time = [
+                4*(SIMULATION_LENGTH_SECONDS//24),
+                12*(SIMULATION_LENGTH_SECONDS//24),
+                20*(SIMULATION_LENGTH_SECONDS//24)
+            ]
+
         else:
+            # hidden service should stay down for a portion of time defined in availabilities[]
             downtime = SIMULATION_LENGTH_SECONDS - int(SIMULATION_LENGTH_SECONDS * (availabilities[i] / 100))
             downtime_start = randint(BOOTSTRAP_LENGTH_SECONDS, SIMULATION_LENGTH_SECONDS - downtime)
             downtime_end = downtime_start + downtime
+
+            start_time = [BOOTSTRAP_LENGTH_SECONDS-60,downtime_end]
+            stop_time = [downtime_start, None]
 
         server = {
             'name': 'hiddenservice{}'.format(i+1),
@@ -356,9 +371,8 @@ def get_servers(args, n_clients):
             'hs_ed25519_secret_key': privkey,
             'hs_ed25519_public_key': pubkey,
             'hs_hostname': onion_url,
-            'downtime': downtime,
-            'downtime_start': downtime_start,
-            'downtime_end': downtime_end
+            'start_time': start_time,
+            'stop_time': stop_time
         }
         tgen_servers.append(server)
 

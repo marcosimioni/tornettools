@@ -173,31 +173,29 @@ def __server(args, server):
         with open("{}/{}".format(hs_prefix, 'hs_ed25519_public_key'), 'wb') as outf:
             outf.write(b"== ed25519v1-public: type0 ==\x00\x00\x00" + server['hs_ed25519_public_key'])
 
-        if "downtime" in server:
-            # first tor process for the hidden service
-            process = {}
-            process["path"] = "{}/bin/tor".format(SHADOW_INSTALL_PREFIX)
-            process["args"] = __format_tor_args(server['name'])
-            process["start_time"] = BOOTSTRAP_LENGTH_SECONDS-60 # start before boostrapping ends
-            process["stop_time"] = server['downtime_start']
+        if "start_time" in server and "stop_time" in server:
 
-            host["processes"].append(process)
+            for idx in range(len(server['start_time'])):
+                process = {}
+                process["path"] = "{}/bin/tor".format(SHADOW_INSTALL_PREFIX)
+                process["args"] = __format_tor_args(server['name'])
 
-            # remove lock file 30 seconds later
-            process = {}
-            process["path"] = "/bin/rm"
-            process["args"] = "lock"
-            process["start_time"] = server['downtime_start']+30
+                if server['start_time'][idx] != None:
+                    process["start_time"] = server['start_time'][idx]
+                if server['stop_time'][idx] != None:
+                    process["stop_time"] = server['stop_time'][idx]
 
-            host["processes"].append(process)
+                host["processes"].append(process)
 
-            # tor process for the hidden service
-            process = {}
-            process["path"] = "{}/bin/tor".format(SHADOW_INSTALL_PREFIX)
-            process["args"] = __format_tor_args(server['name'])
-            process["start_time"] = server['downtime_end']
+                if server['stop_time'][idx] != None:
+                    # remove lock file 1 second later
+                    process = {}
+                    process["path"] = "/bin/rm"
+                    process["args"] = "lock"
+                    process["start_time"] = server['stop_time'][idx]+1
 
-            host["processes"].append(process)
+                    host["processes"].append(process)
+
         else:
             # tor process for the hidden service
             process = {}
