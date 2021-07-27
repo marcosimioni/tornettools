@@ -182,17 +182,25 @@ def __server(args, server):
 
                 if server['start_time'][idx] != None:
                     process["start_time"] = server['start_time'][idx]
-                if server['stop_time'][idx] != None:
-                    process["stop_time"] = server['stop_time'][idx]
+                #if server['stop_time'][idx] != None:
+                #    process["stop_time"] = server['stop_time'][idx]
 
                 host["processes"].append(process)
 
+                #if server['stop_time'][idx] != None:
+                #    # remove lock file 1 second later
+                #    process = {}
+                #    process["path"] = "/bin/rm"
+                #    process["args"] = "lock"
+                #    process["start_time"] = server['stop_time'][idx]+1
+
+                #    host["processes"].append(process)
+
                 if server['stop_time'][idx] != None:
-                    # remove lock file 1 second later
+                    # stop tor
                     process = {}
-                    process["path"] = "/bin/rm"
-                    process["args"] = "lock"
-                    process["start_time"] = server['stop_time'][idx]+1
+                    process["path"] = "~/.local/bin/stop_tor"
+                    process["start_time"] = server['stop_time'][idx]
 
                     host["processes"].append(process)
 
