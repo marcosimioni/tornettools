@@ -344,8 +344,9 @@ def get_servers(args, n_clients):
         start_time = []
         stop_time = []
         if i==n_hiddenservices-1:
-            # 00h up, 04h down, 08h up, 12h down, 16h up, 20h down
-            start_time = [
+            # days 1-2
+            # 4 up, 4 down, 4 up, 4 down, 4 up, 4 down
+            start_time = [ 
                 BOOTSTRAP_LENGTH_SECONDS-60,
                 8*(SIMULATION_LENGTH_SECONDS//24),
                 16*(SIMULATION_LENGTH_SECONDS//24)
@@ -354,6 +355,28 @@ def get_servers(args, n_clients):
                 4*(SIMULATION_LENGTH_SECONDS//24),
                 12*(SIMULATION_LENGTH_SECONDS//24),
                 20*(SIMULATION_LENGTH_SECONDS//24)
+            ]
+            # days 3-4
+            # 7 up, 1 down, 7 up, 1 down, 7 up, 1 down
+            start_time = [
+                BOOTSTRAP_LENGTH_SECONDS-60,
+                8*(SIMULATION_LENGTH_SECONDS//24),
+                16*(SIMULATION_LENGTH_SECONDS//24)
+            ]
+            stop_time = [
+                7*(SIMULATION_LENGTH_SECONDS//24),
+                15*(SIMULATION_LENGTH_SECONDS//24),
+                23*(SIMULATION_LENGTH_SECONDS//24)
+            ]
+            # days 5-6
+            # 11.5 up, 0.5 down, 11.5 up, 0.5 down
+            start_time = [
+                BOOTSTRAP_LENGTH_SECONDS-60,
+                12*(SIMULATION_LENGTH_SECONDS//24)
+            ]
+            stop_time = [
+                11.5*(SIMULATION_LENGTH_SECONDS//24),
+                23.5*(SIMULATION_LENGTH_SECONDS//24)
             ]
 
         else:
